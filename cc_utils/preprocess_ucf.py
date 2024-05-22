@@ -58,16 +58,16 @@ def main(args):
     data_dir = os.path.join(args.data_dir, args.dataset)
     mode = args.mode
     print(f"Data directory: {data_dir}")
-    print(f"Output directory: {output_dir}")
+
 
 
     # output directory
-    output_dir = os.path.join(args.output_dir, args.dataset)
-
     try:
-        os.mkdir(output_dir)
-    except FileExistsError:
-        pass
+        output_dir = os.path.join(args.output_dir, args.dataset)
+        print(f"Output directory: {output_dir}")
+        os.makedirs(output_dir, exist_ok=True)
+    except Exception as e:
+        print(f"Error in creating output directory: {e}")
 
     # density kernel parameters
     kernel_size_list, sigma_list = get_kernel_and_sigma_list(args)
