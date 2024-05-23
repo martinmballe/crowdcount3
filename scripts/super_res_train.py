@@ -42,7 +42,7 @@ def main():
     for layer, block in enumerate(model.middle_block):
         print(layer, block)
         sleep(5)
-    assert False
+    #assert False
 
     model.to(dist_util.dev())
     schedule_sampler = create_named_schedule_sampler(args.schedule_sampler, diffusion)
