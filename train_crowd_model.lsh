@@ -1,0 +1,24 @@
+#!/bin/bash
+#BSUB -J crowd_train           # Job name
+#BSUB -o crowd_train.out       # Output file
+#BSUB -e crowd_train.err       # Error file
+#BSUB -n 4                     # Number of cores (usually, one per GPU)
+#BSUB -R "span[hosts=1]"       # Ensure all cores are on one machine
+#BSUB -R "rusage[mem=64000]"   # Memory requirement per core (increase if needed)
+#BSUB -R "select[gpu]"         # Select GPU
+#BSUB -gpu "num=4:mode=exclusive_process" # Request four GPUs
+#BSUB -W 24:00                 # Wall time (24 hours)
+#BSUB -q gpuv100               # GPU queue
+
+# Load necessary modules and activate your conda environment
+module load cuda/11.0
+source activate crowdenv
+
+# Define variables for paths and flags
+DATA_DIR="--data_dir crowd/ucf_qnrf/part_1/train --val_samples_dir crowd/ucf_qnrf/part_1/val"
+LOG_DIR="--log_dir crowd/results"
+TRAIN_FLAGS="--normalizer 0.8 --pred_channels 1 --batch_size 32 --save_interval 10000 --lr 1e-4"
+MODEL_FLAGS="--attention_resolutions 32,16,8 --class_cond False --diffusion_steps 1000 --large_size 256 --small_size 256 --learn_sigma True --noise_schedule linear --num_channels 192 --num_head_channels 64 --num_res_blocks 2 --resblock_updown True --use_fp16 True --use_scale_shift_norm True"
+
+# Run the training script
+CUDA_VISIBLE_DEVICES=0,1,2,3 python crowd/crowdcount3/scripts/super_res_train.py $DATA_DIR $LOG_DIR $TRAIN_FLAGS $MODEL_FLAGS
